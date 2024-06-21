@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+mongoengine
+geopy
+requests
+boto3
