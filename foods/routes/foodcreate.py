@@ -111,7 +111,10 @@ async def getFoodByType(query: str):
     for value in data_list:
         print(value.id)
         foodRating = FoodRatingTable.objects(foodid=str(value.id)).all()
+        prices = FoodOtherDetailsTable.objects(foodId=str(value.id)).all()
         print(foodRating)
+        priceTojson = prices.to_json()
+        priceTofromJson = json.loads(priceTojson)
         tojsonR = foodRating.to_json()
         fromjosR = json.loads(tojsonR)
         tojson = value.to_json()
@@ -119,7 +122,8 @@ async def getFoodByType(query: str):
         
         actuldata.append({
             "food": fromjson,
-            "rating":fromjosR
+            "rating":fromjosR,
+            "price":priceTofromJson
         })
         
     
