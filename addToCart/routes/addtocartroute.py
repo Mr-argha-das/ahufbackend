@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,HTTPException
 from fastapi.responses import JSONResponse
 from addToCart.models.addTocartmodel import Addtocartcreatemodel,AddtocartTable
 from foods.models.foodmodel import FoodTable, FoodOtherDetailsTable
@@ -78,3 +78,27 @@ async def deletecartall(userid:str):
 
 
     
+@router.put("/api/v1/update-cart/{foodId}")
+async def update_cart(foodId: str, value: int):
+    try:
+        cart_item = AddtocartTable.objects.get(id=ObjectId(foodId))
+    except AddtocartTable.DoesNotExist:
+        raise HTTPException(status_code=404, detail="Product not found in cart")
+
+    cart_item.quantity += value
+
+    if cart_item.quantity < 1:
+        cart_item.delete()
+        return {
+            "message": "Product removed from cart as quantity became zero or less",
+            "status": True
+        }
+
+    cart_item.save()
+    tojson = cart_item.to_json()
+    fromjson = json.loads(tojson)
+    return {
+        "message": "Cart updated successfully",
+        "data": fromjson,
+        "status": True
+    }
